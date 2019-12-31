@@ -1,4 +1,4 @@
-module go-utils
+module github.com/llqgit/go-utils
 
 go 1.12
 
