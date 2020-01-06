@@ -26,36 +26,12 @@ func TimeCost(start time.Time, msg ...string) {
 }
 
 // WeeksInYear 计算时间是当年的第几周（周一为第一天）（根据本周周一判断本周是哪年的）
-func WeeksInYear(today time.Time) (weeks int, year int) {
+func WeeksInYear(today time.Time) (year int, week int) {
 	/************ 避免跨年特殊情况 ************/
 	// 使用本周第一天（周一）作为本周所处哪一周的具体判断（避免跨年时周数被撕裂的情况）
 	weekday := GetWeekDay(today)
 	t := today.AddDate(0, 0, -weekday)
-
-	/************ 正常计算周数 ************/
-	yearDay := t.YearDay()
-	// 获取今年的年数 eg:2019
-	year = t.Year()
-	// 判断第一天是周几
-	yearFirstDay := t.AddDate(0, 0, -yearDay+1)
-	firstDayInWeek := int(yearFirstDay.Weekday())
-	// 今年第一周有几天
-	firstWeekDays := 1
-	if firstDayInWeek != 0 {
-		firstWeekDays = 7 - firstDayInWeek + 1
-	}
-	var week int
-	if yearDay <= firstWeekDays {
-		week = 1
-	} else {
-		// 如果整除时，为周日。此时应该判断周日是每周第一天，还是每周最后一天
-		base := 2
-		if (yearDay-firstWeekDays)%7 == 0 {
-			base = 1
-		}
-		week = (yearDay-firstWeekDays)/7 + base
-	}
-	return week, year
+	return t.ISOWeek()
 }
 
 // 计算时间到周末的毫秒数（到周日）
@@ -70,7 +46,7 @@ func EndOfWeek(t time.Time) time.Duration {
 }
 
 // LastWeeksInYear 计算上一周是哪年的第几周
-func LastWeeksInYear() (weeks int, year int) {
+func LastWeeksInYear() (year int, week int) {
 	t := time.Now()
 	lastWeek := t.AddDate(0, 0, -7)
 	return WeeksInYear(lastWeek)
